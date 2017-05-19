@@ -1,6 +1,6 @@
 #![deny(warnings)]
 #![cfg_attr(test, deny(warnings))]
-
+#![feature(test)]
 //! A small library for reading and writing BMP images.
 //!
 //! The library supports uncompressed BMP Version 3 images.
@@ -31,6 +31,7 @@
 //! ```
 //!
 
+extern crate test;
 extern crate byteorder;
 
 use std::convert::AsRef;
@@ -582,14 +583,14 @@ mod tests {
     }
 
     // TODO: Add benches when they are considered stable
-    // #[bench]
-    // fn write_bmp(b: &mut test::Bencher) {
-    //     let img = Image::new(320, 240);
-    //     b.iter(|| img.save("test/bench_test.bmp"));
-    // }
+    #[bench]
+    fn write_bmp(b: &mut test::Bencher) {
+        let img = Image::new(320, 240);
+        b.iter(|| img.save("test/bench_test.bmp"));
+    }
 
-    // #[bench]
-    // fn open_bmp(b: &mut test::Bencher) {
-    //     b.iter(|| open("test/bmptestsuite-0.9/valid/24bpp-320x240.bmp"));
-    // }
+    #[bench]
+    fn open_bmp(b: &mut test::Bencher) {
+        b.iter(|| open("test/bmptestsuite-0.9/valid/24bpp-320x240.bmp"));
+    }
 }
