@@ -1,5 +1,5 @@
 #![deny(warnings)]
-#![cfg_attr(test, deny(warnings))]
+#![cfg_attr(test, warn(warnings))]
 #![feature(test)]
 //! A small library for reading and writing BMP images.
 //!
@@ -79,6 +79,7 @@ pub struct Pixel {
 
 impl Pixel {
     /// Creates a new `Pixel`.
+    #[inline]
     pub fn new(r: u8, g: u8, b: u8) -> Pixel {
         Pixel { r: r, g: g, b: b }
     }
