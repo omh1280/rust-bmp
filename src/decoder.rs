@@ -226,16 +226,21 @@ fn read_pixels(bmp_data: &mut Cursor<Vec<u8>>, width: u32, height: u32,
                offset: u32, padding: i64) -> BmpResult<Vec<Pixel>> {
     let mut data = Vec::with_capacity((height * width) as usize);
     // seek until data
-    bmp_data.seek(SeekFrom::Start(offset as u64))?;
+    let mut vec = bmp_data.clone().into_inner();
+    //bmp_data.seek(SeekFrom::Start(offset as u64))?;
     // read pixels until padding
-    let mut px = [0; 3];
-    for _ in 0 .. height {
-        for _ in 0 .. width {
-            bmp_data.read(&mut px)?;
-            data.push(px!(px[2], px[1], px[0]));
+    let mut pad_accum = 0;
+    let mut px_idx: usize = 0;
+    for y in 0 .. height {
+        for x in 0 .. width {
+            px_idx = (offset + pad_accum + (x + y * width) * 3) as usize;
+            data.push(px!(vec[px_idx + 2], vec[px_idx + 1], vec[px_idx]));
+            // bmp_data.read(&mut px)?;
+            // data.push(px!(px[2], px[1], px[0]));
         }
+        pad_accum += padding as u32;
         // seek padding
-        bmp_data.seek(SeekFrom::Current(padding))?;
+        // bmp_data.seek(SeekFrom::Current(padding))?;
     }
     Ok(data)
 }

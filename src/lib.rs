@@ -1,4 +1,4 @@
-#![deny(warnings)]
+#![warn(warnings)]
 #![cfg_attr(test, warn(warnings))]
 #![feature(test)]
 //! A small library for reading and writing BMP images.
