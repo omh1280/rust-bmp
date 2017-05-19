@@ -90,12 +90,11 @@ pub fn decode_image(bmp_data: &mut Cursor<Vec<u8>>) -> BmpResult<Image> {
     let width = dib_header.width.abs() as u32;
     let height = dib_header.height.abs() as u32;
     let padding = width % 4;
-
     let data = match color_palette {
         Some(ref palette) =>
             read_indexes(bmp_data.get_mut(), &palette, width as usize, height as usize,
                          dib_header.bits_per_pixel, header.pixel_offset as usize)?,
-        None => read_pixels(bmp_data, width, height, header.pixel_offset, padding as i64)?
+        None => read_pixels(bmp_data.get_mut(), width, height, header.pixel_offset, padding as i64)?
     };
 
     let image = Image {
@@ -222,25 +221,19 @@ fn read_indexes(bmp_data: &mut Vec<u8>, palette: &Vec<Pixel>,
     Ok(data)
 }
 
-fn read_pixels(bmp_data: &mut Cursor<Vec<u8>>, width: u32, height: u32,
+fn read_pixels(bmp_data: &mut Vec<u8>, width: u32, height: u32,
                offset: u32, padding: i64) -> BmpResult<Vec<Pixel>> {
     let mut data = Vec::with_capacity((height * width) as usize);
-    // seek until data
-    let mut vec = bmp_data.clone().into_inner();
-    //bmp_data.seek(SeekFrom::Start(offset as u64))?;
     // read pixels until padding
     let mut pad_accum = 0;
-    let mut px_idx: usize = 0;
+    let mut px_idx: usize;
     for y in 0 .. height {
         for x in 0 .. width {
             px_idx = (offset + pad_accum + (x + y * width) * 3) as usize;
-            data.push(px!(vec[px_idx + 2], vec[px_idx + 1], vec[px_idx]));
-            // bmp_data.read(&mut px)?;
-            // data.push(px!(px[2], px[1], px[0]));
+            data.push(px!(bmp_data[px_idx + 2], bmp_data[px_idx + 1], bmp_data[px_idx]));
         }
+        // accumulate padding
         pad_accum += padding as u32;
-        // seek padding
-        // bmp_data.seek(SeekFrom::Current(padding))?;
     }
     Ok(data)
 }
